@@ -59,14 +59,12 @@ l1:
             jmp l1
 endloop:    
 ;color fill
-            lda #$20
+redo:       lda #$20
             ldy #$00
             ldx #$01
             jsr SetVeraHML
-redo:       ldx z_Regs            
+            ldx z_Regs            
 l2:         
-;            lda #$02
-;            sta V_D1
             stx V_D1
             inx
             lda V_M
@@ -74,46 +72,15 @@ l2:
             beq endloop2
             jmp l2
 endloop2:
-;            inc z_Regs
-;            jmp redo
+            inc z_Regs
+            jmp redo
             rts
 
-            ;palette
-            lda #$14
-            ldy #$02
-            ldx #$00
-            jsr SetVeraHML
-
-            ldx #2
-            ldy #0
-            lda #<palette
-            sta z_L
-            lda #>palette
-            sta z_H
-Paletteloop:
-            lda (z_HL),y
-            sta V_D1
-            iny
-            bne Paletteloop
-            inc z_H
-            dex
-            bne Paletteloop
-            rts
 SetVeraHML:
             sta V_H
             sty V_M
             stx V_L
             rts
-palette:
-    .word  $0008
-    .word  $0FF0
-    .word  $00FF
-    .word  $0F00
-    .word  $0001
-    .word  $0008
-    .word  $0FF0
-    .word  $00FF
-    .word  $0F00
-    .word  $0001
+
   
 
