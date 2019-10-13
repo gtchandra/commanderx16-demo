@@ -1,11 +1,4 @@
-z_Regs = $20
-z_HL = z_Regs
-z_L = z_Regs
-z_H = z_Regs+1
-z_DE = z_Regs+4
-z_E = z_Regs+4
-z_D = z_Regs+5
-z_As = z_Regs+6
+z_R = $20
 
 V_H=$9F20
 V_M=$9F21
@@ -49,9 +42,9 @@ l1:
             sta V_D1
             lda #$02
             sta V_D1
-            lda #$20
+            lda #$e0
             sta V_D1
-            lda #$20
+            lda #$e0
             sta V_D1
             lda V_M
             cmp #$3b
@@ -63,7 +56,7 @@ redo:       lda #$20
             ldy #$00
             ldx #$01
             jsr SetVeraHML
-            ldx z_Regs            
+            ldx z_R          
 l2:         
             stx V_D1
             inx
@@ -72,15 +65,19 @@ l2:
             beq endloop2
             jmp l2
 endloop2:
-            inc z_Regs
+            jsr$ffe4
+            cmp #$20
+            beq finish
+            inc z_R
             jmp redo
+finish:     
             rts
-
 SetVeraHML:
             sta V_H
             sty V_M
             stx V_L
             rts
 
-  
+  SetPalette:
+            
 
