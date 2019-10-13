@@ -65,12 +65,10 @@ l2:
             beq endloop2
             jmp l2
 endloop2:
-            jsr$ffe4
-            cmp #$20
-            beq finish
+            jsr$ffe4    ;keyboard control
             inc z_R
-            jmp redo
-finish:     
+            cmp #$20
+            bne redo
             rts
 SetVeraHML:
             sta V_H
@@ -79,5 +77,5 @@ SetVeraHML:
             rts
 
   SetPalette:
-            
+
 
