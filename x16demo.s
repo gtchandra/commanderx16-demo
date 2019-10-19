@@ -27,23 +27,12 @@ VERA_CTRL=$9F25
             jsr SetVeraHML
             lda #$21
             sta V_D1
-            ;configure end
+            ;setup vera for character ram address: $00000
             lda #$20
             ldy #$00
             ldx #$00
             jsr SetVeraHML
-l1:         
-;            lda #$e0
-;            sta V_D1
-
-            lda #$07
-            sta V_D1
-            lda #$01
-            sta V_D1
-            lda #$02
-            sta V_D1
-            lda #$e0
-            sta V_D1
+l1:         ;build a full page of characters ($E0 x $3b)
             lda #$e0
             sta V_D1
             lda V_M
@@ -51,7 +40,7 @@ l1:
             beq endloop
             jmp l1
 endloop:    
-;color fill
+;color setup for color ram
 redo:       lda #$20
             ldy #$00
             ldx #$01
