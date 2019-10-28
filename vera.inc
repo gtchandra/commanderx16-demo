@@ -73,3 +73,4 @@ VROM_petscii = $1F000
 	lda v0
 	sta VERA_data
 .endmacro
+
