@@ -71,19 +71,21 @@ endloop:
             jmp l2
 theend:     
 
-x0:         VERA_SET_ADDR $00001, 2
+x0:         VERA_SET_ADDR $00001, 0 ;no auto increment for palette loop
             ldx #$00
             ldy #$00
 x1:         
-            lda VERA_data
-            dec VERA_ADDR_LO
-            dec VERA_ADDR_LO
+            lda VERA_data           
             dec
             cmp #$ff
             bne con
             lda #$40
 con:        sta VERA_data
-            inx
+            inc VERA_ADDR_LO
+            inc VERA_ADDR_LO
+            bne next
+            inc VERA_ADDR_MID
+next:       inx
             jsr checkpad     
             cpx #$00
             bne x1
