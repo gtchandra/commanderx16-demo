@@ -17,14 +17,11 @@ imgcounter=$35
             VERA_WRITE #%0000001
             VERA_WRITE #128 ;set vertical scale
             VERA_WRITE #128 ;set horizontal scale
-            
             ;configure mode 1 :: char 256 colors
             VERA_SET_ADDR $40000, 1
             VERA_WRITE #$21
            
             ;configure palette
-            ;should be modified to allow a data transfer of 512 bytes! now it breaks after 256 cycles meaning 128 colors
-            ;load zp registers image
             lda #<palette_data
             sta z_l
             lda #>palette_data
@@ -40,8 +37,7 @@ pl:         lda (z_l),y
             bne p2
             inc z_h
 p2:         inx
-            ;cpx #$80    ;loading $40 = 64 palette values in 2 byte steps GB + R
-            ;now palette is 256 so it should define 2 cycles of FF
+            ;loading a 256 palette in 2 cycles of 256 elements (GB+R)
             bne pl
             inc imgcounter
             lda imgcounter
@@ -118,12 +114,10 @@ next:       inx
             iny
             cpy #$3c
             bne x1
-
-            jsr$ffe4    ;keyboard control
+            jsr $ffe4    ;keyboard control
             cmp #$20
             bne x0      ;no key pressed go to loop
             rts
- 
 checkpad:   ;lines are padded, so after 80 positions you need to skip $5f positions x is the counter in this sr
             cpx length
             bne exitcheck
@@ -141,3 +135,4 @@ palette_data:
 image_data:
 .incbin "image.dat"
 .byte   $ff,$ff  ;end marker
+bop:    .asciiz "ciao!"
