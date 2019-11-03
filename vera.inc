@@ -69,6 +69,74 @@ VROM_petscii = $1F000
 	sta VERA_ADDR_HI
 .endmacro
 
+;VERA_LOAD_PALETTE (address, size )
+.macro VERA_LOAD_PALETTE paddr, psize 
+            ldy #$00
+  			;configure palette
+            lda #<paddr
+            sta z_l
+            lda #>paddr
+            sta z_h
+.if psize > $FF
+            nop
+            nop
+ 			lda #>psize
+            sta imgcounter
+vpl0:		ldx #$FF
+vpl1:       lda (z_l),y     
+            sta VERA_data
+            inc z_l
+            bne vpl2
+            inc z_h
+vpl2:       dex 
+			bne vpl1
+			dec imgcounter
+            lda imgcounter
+            cmp #$00
+            bne vpl0
+.endif 
+           	ldx #<psize
+			cpx #$00
+			beq vpl5
+vpl3:       lda (z_l),y     
+            sta VERA_data
+            inc z_l
+            bne vpl4
+            inc z_h
+vpl4:       dex 
+			bne vpl3
+vpl5:
+.endmacro
+
+
+;generalizzare la load palette con una load data che aggiunge parametri di line e skip
+.macro VERA_LOAD_CHAR vlclinesize, vlcpad, vlcchar   
+            ;setup padamount and length
+            lda vlclinesize
+            sta length
+            lda vlcpad
+            sta padamount
+            ldy #$00
+            ldx #$00
+vlc1:       
+            VERA_WRITE vlcchar
+            inx
+ 			cpx length
+            bne vlc3
+            ldx #$00
+            lda VERA_ADDR_LO
+            adc padamount
+            sta VERA_ADDR_LO
+            bcs vlc2
+vlc2:       inc VERA_ADDR_MID
+vlc3:  
+            cpx #$00 ;line finished
+            bne vlc1
+            iny
+            cpy #$3c	;liness
+            bne vlc1
+.endmacro
+
 .macro VERA_WRITE v0 
 	lda v0
 	sta VERA_data

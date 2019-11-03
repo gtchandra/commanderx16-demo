@@ -20,55 +20,13 @@ imgcounter=$35
             ;configure mode 1 :: char 256 colors
             VERA_SET_ADDR $40000, 1
             VERA_WRITE #$21
-           
-            ;configure palette
-            lda #<palette_data
-            sta z_l
-            lda #>palette_data
-            sta z_h
-            lda #$00
-            sta imgcounter
-            VERA_SET_ADDR $40200,1
-            ldx #$00
-            ldy #$00
-pl:         lda (z_l),y     
-            sta VERA_data
-            inc z_l
-            bne p2
-            inc z_h
-p2:         inx
-            ;loading a 256 palette in 2 cycles of 256 elements (GB+R)
-            bne pl
-            inc imgcounter
-            lda imgcounter
-            cmp #$02
-            bne pl
-
-            ;setup padamount and length
-            lda #$50
-            sta length
-            lda #$5f
-            sta padamount
-            ldy #$00
-            ldx #$00
+            ;setup VERA END
+            VERA_SET_ADDR $40200,1  ;palette loading
+            VERA_LOAD_PALETTE palette_data, $1FF
             ;setup vera for character ram address: $00000
             VERA_SET_ADDR $00000, 2
-l1:         ;build a full page of characters (PETSCII $E0 is the rvs on square)
-            VERA_WRITE #$e0
-            inx
-            jsr checkpad
-            cpx #$00 ;line finished
-            bne l1
-            iny
-            cpy #$3c
-            bne l1
-  
+            VERA_LOAD_CHAR #$50, #$5f, #$e0
 ;fill the color ram with image data
-;load zp variables padamount and length
-            lda #$50
-            sta length
-            lda #$5f
-            sta padamount
 ;load zp registers image
             lda #<image_data
             sta z_l
@@ -131,8 +89,9 @@ xs1:        inc VERA_ADDR_MID
 exitcheck:  
             rts          
 palette_data:
-.incbin "palette.dat"
+.incbin "palette.dat"    
+.asciiz "end palette"
 image_data:
 .incbin "image.dat"
 .byte   $ff,$ff  ;end marker
-bop:    .asciiz "ciao!"
+bop:    .asciiz "end image"
