@@ -101,8 +101,6 @@ vld4:       dex
 vld5:       rts
 .endmacro
 
-
-;generalizzare la load palette con una load data che aggiunge parametri di line e skip
 .macro VERA_LOAD_CHAR vlclinesize, vlcpad, vlcchar   
             ;setup padamount and length
             lda vlclinesize

@@ -55,3 +55,24 @@ yy:     lda ($FB),Y
 .macro SYS_END_IRQ  
     jmp (irq_redirect)
 .endmacro
+;debug macro till TBC
+.macro PRINT
+            lda size_h
+            and #%00001111
+            ora #%00110000
+            jsr $ffd2
+            lda size_l
+            lsr
+            lsr
+            lsr
+            lsr
+            ora #%00110000
+            jsr $ffd2
+            lda size_l
+            and #%00001111
+            ora #%00110000
+            jsr $ffd2
+            lda #$20
+            jsr $ffd2
+            rts
+.endmacro
