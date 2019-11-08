@@ -69,43 +69,36 @@ VROM_petscii = $1F000
 	sta VERA_ADDR_HI
 .endmacro
 
-;VERA_LOAD_PALETTE (address, size )
-.macro VERA_LOAD_PALETTE paddr, psize 
+;VERA_LOAD_DATA (address, size, linesize, skip )
+.macro VERA_LOAD_DATA 
             ldy #$00
   			;configure palette
-            lda #<paddr
-            sta z_l
-            lda #>paddr
-            sta z_h
-.if psize > $FF
-            nop
-            nop
- 			lda #>psize
-            sta imgcounter
-vpl0:		ldx #$FF
-vpl1:       lda (z_l),y     
+            lda size_h
+            beq vld6
+ 			lda size_h
+vld0:		ldx #$FF
+vld1:       lda (data_pointer_l),y     
             sta VERA_data
-            inc z_l
-            bne vpl2
-            inc z_h
-vpl2:       dex 
-			bne vpl1
-			dec imgcounter
-            lda imgcounter
+            inc data_pointer_l
+            bne vld2
+            inc data_pointer_h
+vld2:       dex 
+			bne vld1
+			dec size_h
+            lda size_h
             cmp #$00
-            bne vpl0
-.endif 
-           	ldx #<psize
+            bne vld0
+vld6:       ldx size_l
 			cpx #$00
-			beq vpl5
-vpl3:       lda (z_l),y     
+			beq vld5
+vld3:       lda (data_pointer_l),y     
             sta VERA_data
-            inc z_l
-            bne vpl4
-            inc z_h
-vpl4:       dex 
-			bne vpl3
-vpl5:
+            inc data_pointer_l
+            bne vld4
+            inc data_pointer_h
+vld4:       dex 
+			bne vld3
+vld5:       rts
 .endmacro
 
 
@@ -122,19 +115,69 @@ vlc1:
             VERA_WRITE vlcchar
             inx
  			cpx length
-            bne vlc3
+            bne vlc1
             ldx #$00
             lda VERA_ADDR_LO
+            clc
             adc padamount
             sta VERA_ADDR_LO
-            bcs vlc2
-vlc2:       inc VERA_ADDR_MID
-vlc3:  
-            cpx #$00 ;line finished
+            bcc vlc2
+            inc VERA_ADDR_MID
+vlc2:       iny
+            cpy #$3c	;#liness
             bne vlc1
+.endmacro
+
+.macro VERA_LOOP_CHAR_COLOR vlcclinesize, vlccpad   ;no no sbagliato questo cambia il valore dei caratteri
+            ;setup padamount and length
+            lda vlcclinesize
+            sta length
+            lda vlccpad
+            sta padamount
+            ldy #$00
+            ldx #$00
+vlcc1:       
+            ;unless I can do inc vera_data!!!
+            lda VERA_data
+            sec
+            sbc #$02
+            sta VERA_data
+            clc
+            lda VERA_ADDR_LO
+            adc #$02
+            sta VERA_ADDR_LO
+            bcc vlcc4
+            inc VERA_ADDR_MID
+vlcc4:      inx
+ 			cpx length
+            bne vlcc1
+            ldx #$00
+            lda VERA_ADDR_LO
+            clc
+            adc padamount
+            sta VERA_ADDR_LO
+            bcc vlcc3
+            inc VERA_ADDR_MID
+vlcc3:  
             iny
             cpy #$3c	;liness
-            bne vlc1
+            bne vlcc1
+.endmacro
+
+.macro VERA_INC_POINTER
+            inc VERA_ADDR_LO
+            bne vip1
+            inc VERA_ADDR_MID
+vip1:       rts
+.endmacro
+.macro VERA_DEC_POINTER
+            lda VERA_ADDR_LO
+            beq vdp1
+            dec VERA_ADDR_LO
+            rts
+vdp1:       dec VERA_ADDR_LO
+            dec VERA_ADDR_MID
+            rts
 .endmacro
 
 .macro VERA_WRITE v0 
