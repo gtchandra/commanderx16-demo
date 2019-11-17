@@ -1,3 +1,10 @@
+FILENAME=$05
+FILENAME_L=$05
+FILENAME_H=FILENAME_L+1
+FILENAMELENGTH=$07
+LOADADDR_L=$08
+LOADADDR_H=LOADADDR_L+1
+
 .macro SYS_COPY src, dst, size 
     lda #<src ;.src to $FC $FB
     sta $FB
@@ -55,7 +62,7 @@ yy:     lda ($FB),Y
 .macro SYS_END_IRQ  
     jmp (irq_redirect)
 .endmacro
-;debug macro till TBC
+;debug macro still TBC
 .macro PRINT
             lda size_h
             and #%00001111
@@ -75,4 +82,19 @@ yy:     lda ($FB),Y
             lda #$20
             jsr $ffd2
             rts
+.endmacro
+.macro LOAD 
+            lda FILENAMELENGTH
+            ldx FILENAME_L
+            ldy FILENAME_H
+            jsr $FFBD   ;call SETNAM
+            lda #$01
+            ldx #$01
+            ldy #$00    ;load at mem addr defined 
+            jsr $FFBA   ;call SETLFS
+            lda #$00
+            ldx LOADADDR_L
+            ldy LOADADDR_H
+            jsr $FFD5   ;call LOAD
+            ;bcs no exception handling here
 .endmacro

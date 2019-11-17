@@ -1,5 +1,4 @@
-z_l=$30
-z_h=z_l+1
+
 data_pointer_l=$30
 data_pointer_h=data_pointer_l+1
 size_l=$32
@@ -54,8 +53,8 @@ imgcounter=$35
             sta imgcounter
 l0:         lda #$50
             sta size_l
-            jsr vera_load      
-            ;skipping data in VERA char lines
+            jsr vera_load      ;transfer lines of data
+            ;skipping data is needed in VERA char mode
             lda VERA_ADDR_LO
             adc #$5f
             sta VERA_ADDR_LO

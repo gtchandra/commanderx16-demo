@@ -69,35 +69,51 @@ VROM_petscii = $1F000
 	sta VERA_ADDR_HI
 .endmacro
 
+;VERA_LOAD_DATA (address, size)
+.macro VERA_LOAD_DATA2 
+            ldy #$00
+vld20:      lda (data_pointer_l),y
+            sta VERA_data
+            iny 
+            beq vld21
+            dec size_l
+            bne vld20
+            dec size_h
+            bne vld20
+            rts
+vld21:
+            inc data_pointer_h
+            jmp vld20
+.endmacro
+
 ;VERA_LOAD_DATA (address, size, linesize, skip )
 .macro VERA_LOAD_DATA 
             ldy #$00
-  			;configure palette
+            ;configure palette
             lda size_h
             beq vld6
- 			lda size_h
-vld0:		ldx #$FF
+vld0:       ldx #$FF
 vld1:       lda (data_pointer_l),y     
             sta VERA_data
             inc data_pointer_l
             bne vld2
             inc data_pointer_h
 vld2:       dex 
-			bne vld1
-			dec size_h
+            bne vld1
+            dec size_h
             lda size_h
             cmp #$00
             bne vld0
 vld6:       ldx size_l
-			cpx #$00
-			beq vld5
+            cpx #$00
+            beq vld5
 vld3:       lda (data_pointer_l),y     
             sta VERA_data
             inc data_pointer_l
             bne vld4
             inc data_pointer_h
 vld4:       dex 
-			bne vld3
+            bne vld3
 vld5:       rts
 .endmacro
 
