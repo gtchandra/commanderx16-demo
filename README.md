@@ -7,4 +7,6 @@ https://github.com/commanderx16/x16-emulator
 More details about the VERA (video graphic interface)
 https://github.com/commanderx16/x16-docs/blob/master/VERA%20Programmer's%20Reference.md
 
+*now fixed for the latest emulator version 34*
+
 enjoy
