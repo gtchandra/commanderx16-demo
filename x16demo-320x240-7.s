@@ -52,27 +52,7 @@ imgcounter=$35
             lda #$ff
             sta size_l
             jsr vera_load
-;tracker---remove           
-            lda $30
-            sta $2003
-            lda $31
-            sta $2004
-            ldy #$00
-            VERA_SET_ADDR $F1000,1  ;palette loading in VERA
-next:       lda VERA_data 
-            sta $2100,y
-            iny
-            bne next
-next2:      lda VERA_data 
-            sta $2200,y
-            iny
-            bne next2
-            lda VERA_data
-            sta $2300
-        
-;tracker---remove            
             
-
             ;set the file name index to 0 (image0.dat)
             lda #$30
             sta filname+5
