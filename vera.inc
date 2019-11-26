@@ -1,7 +1,7 @@
 VERA_base = $9f20
-VERA_ADDR_LO   = VERA_base+2
+VERA_ADDR_LO   = VERA_base
 VERA_ADDR_MID  = VERA_base+1
-VERA_ADDR_HI  = VERA_base
+VERA_ADDR_HI  = VERA_base+2
 VERA_data       = VERA_base+3
 VERA_data2      = VERA_base+4
 VERA_ctrl       = VERA_base+5
@@ -74,16 +74,19 @@ VROM_petscii = $1F000
             ldy #$00
 vld20:      lda (data_pointer_l),y
             sta VERA_data
-            iny 
+            inc data_pointer_l
             beq vld21
-            dec size_l
+vld22:      dec size_l
             bne vld20
             dec size_h
             bne vld20
+            ;write the last pending byte
+            lda (data_pointer_l),y
+            sta VERA_data
             rts
 vld21:
             inc data_pointer_h
-            jmp vld20
+            jmp vld22            
 .endmacro
 
 ;VERA_LOAD_DATA (address, size, linesize, skip )
