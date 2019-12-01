@@ -88,13 +88,29 @@ yy:     lda ($FB),Y
             ldx FILENAME_L
             ldy FILENAME_H
             jsr $FFBD   ;call SETNAM
-            lda #$01
+            lda #$02
             ldx #$01
             ldy #$00    ;load at mem addr defined 
             jsr $FFBA   ;call SETLFS
             lda #$00
             ldx LOADADDR_L
             ldy LOADADDR_H
+            jsr $FFD5   ;call LOAD
+            ;bcs no exception handling here
+.endmacro
+
+.macro VLOAD bank, addrlo,addrhi
+            lda FILENAMELENGTH
+            ldx FILENAME_L
+            ldy FILENAME_H
+            jsr $FFBD   ;call SETNAM
+            lda #$02
+            ldx #$01
+            ldy #$00    ;load at mem addr defined 
+            jsr $FFBA   ;call SETLFS
+            lda #bank+2 ;it's really like that (former meaning A: 0 = Load, 1-255 = Verify)
+            ldx addrlo  
+            ldy addrhi  
             jsr $FFD5   ;call LOAD
             ;bcs no exception handling here
 .endmacro
